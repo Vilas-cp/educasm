@@ -64,10 +64,5 @@ export interface QuestionHistory {
   usedExamples: Set<string>;
 }
 
-export interface MarkdownComponentProps {
-  node?: any;
-  children?: React.ReactNode;
-  [key: string]: any;
-}
 
 // Add other shared types here 

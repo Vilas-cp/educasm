@@ -1,36 +1,67 @@
-import { Ratelimit } from '@upstash/ratelimit';
-import { kv } from '@vercel/kv';
+import { NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
-const minuteLimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(15, '1m'), // 15 requests per minute
-});
+export async function POST(request: Request) {
+  try {
+    const { messages, stream } = await request.json();
 
-const hourLimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(250, '1h'), // 250 requests per hour
-});
+    if (!messages || !Array.isArray(messages)) {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
 
-const dayLimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(500, '24h'), // 500 requests per day
-});
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-// Function to check rate limits
-export async function checkRateLimit(ip: string) {
-  const minuteResult = await minuteLimit.limit(`minute_${ip}`);
-  const hourResult = await hourLimit.limit(`hour_${ip}`);
-  const dayResult = await dayLimit.limit(`day_${ip}`);
+    const prompt = messages
+      .map((msg: { role: string; content: string }) => `${msg.role}: ${msg.content}`)
+      .join('\n');
 
-  const success = minuteResult.success && hourResult.success && dayResult.success;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const content = response.text();
+    const chunkSize=20;
 
-  return {
-    success,
-    limits: {
-      minute: minuteResult,
-      hour: hourResult,
-      day: dayResult,
-    },
-  };
+    if (stream) {
+      const encoder = new TextEncoder();
+
+      const streamResponse = new ReadableStream({
+        async start(controller) {
+          const words = content.split(' ');
+          let buffer = '';
+          
+          for (const word of words) {
+            buffer += `${word} `;
+            
+            if (buffer.endsWith('.') || buffer.endsWith('!') || buffer.endsWith('?') || buffer.length >= chunkSize) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: buffer.trim() })}\n\n`));
+              buffer = '';
+            }
+            
+            await new Promise((resolve) => setTimeout(resolve, 100)); 
+          }
+          
+          if (buffer) { 
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: buffer.trim() })}\n\n`));
+          }
+      
+          controller.close();
+        },
+      });
+      
+
+      return new Response(streamResponse, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        },
+      });
+    } else {
+      return NextResponse.json({ content });
+    }
+  } catch (error) {
+    console.error('Gemini API Error:', error);
+    return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 });
+  }
 }

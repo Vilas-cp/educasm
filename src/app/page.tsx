@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/app/providers";
 import { PreFillForm } from "@/components/shared/PreFillForm";
@@ -11,13 +11,16 @@ export default function HomePage() {
 
   useEffect(() => {
     if (userContext) {
-      router.replace("/explore"); 
+      router.replace("/explore");
     }
   }, [userContext, router]);
 
   return (
     <div className="min-h-screen bg-background text-white p-4">
-      <PreFillForm onSubmit={(context) => setUserContext(context)} />
+      <Suspense fallback={<p>Loading Form...</p>}>
+        <PreFillForm onSubmit={(context) => setUserContext(context)} />
+      </Suspense>
     </div>
   );
 }
+

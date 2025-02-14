@@ -1,4 +1,5 @@
 // src/components/Explore/ExploreView.tsx
+"use client"
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
