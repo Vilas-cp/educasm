@@ -4,7 +4,7 @@ import { Question, UserContext, ExploreResponse, StreamChunk } from "../types";
 export class GPTService {
   private async makeRequest(messages: any[], stream: boolean = false) {
     try {
-      const response = await fetch("/api/gpt", {
+      const response = await fetch("https://back-edu-tau.vercel.app/api/gpt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
