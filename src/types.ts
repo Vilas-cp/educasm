@@ -4,7 +4,7 @@ export interface UserContext {
 
 export interface MarkdownComponentProps {
   children: React.ReactNode;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Question {
@@ -41,15 +41,16 @@ export interface PreFillFormProps {
 
 declare global {
   interface Window {
-    dataLayer: any[];
+    dataLayer: Record<string, unknown>[];
   }
-} 
+}
 
 export interface StreamChunk {
   text: string;
-  topics: any[];
-  questions: any[];
+  topics: Record<string, unknown>[];
+  questions: QuestionInfo[];
 }
+
 export interface TopicInfo {
   topic: string;
   type: string;
