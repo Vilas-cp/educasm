@@ -1,50 +1,97 @@
-# React + TypeScript + Vite
+AI-Powered Educational Platform (Next.js Upgrade)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Overview
 
-Currently, two official plugins are available:
+This project is an AI-powered educational platform that was originally built with React.js and has been migrated to Next.js for improved performance, security, and scalability. The migration was done without starting a new project, ensuring a seamless transition.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Key Features & Improvements
 
-## Expanding the ESLint configuration
+🚀 Migrated from React.js to Next.js
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Refactored the project to use Next.js’s routing, SSR, and API routes.
 
-- Configure the top-level `parserOptions` property like this:
+Improved performance, SEO, and scalability.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+No need for React Router—Next.js’s file-based routing simplifies navigation.
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+🔒 Secure API Calls (Moved to Backend)
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Previously, API calls were made from the frontend, exposing the API key.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+Now, all API requests are handled on the backend using Vercel serverless functions.
+
+Ensured streaming responses still work for real-time interactions.
+
+🛡 Implemented Rate Limiting
+
+Added rate limits to prevent API abuse.
+
+Limits per minute, hour, and day to maintain API stability.
+
+Users receive proper retry-after messages when limits are exceeded.
+
+💬 Chat History (Explore Mode)
+
+Implemented scrollable chat history (similar to Perplexity.ai).
+
+Ensured smooth auto-scrolling and message retention.
+
+🎵 Fixed Play/Pause Button (Playground Mode)
+
+Previously, the button paused but didn’t resume properly.
+
+Now, seamless pausing and resuming with correct state handling.
+
+Tech Stack
+
+Frontend: Next.js (migrated from React.js)
+
+Backend: Vercel Serverless Functions
+
+Styling: Chakra UI
+
+Rate Limiting: rate-limiter-flexible
+
+AI Integration: Google Generative AI API
+
+Setup & Installation
+
+Clone the repository:
+
+git clone https://github.com/your-repo.git
+cd your-repo
+
+Install dependencies:
+
+npm install
+
+Create a .env.local file and add your API key:
+
+GEMINI_API_KEY=your_api_key_here
+
+Run the development server:
+
+npm run dev
+
+Open http://localhost:3000 in your browser.
+
+Deployment
+
+Deployed on Vercel for optimal performance and edge function support.
+
+Run:
+
+vercel deploy
+
+Future Improvements
+
+Implement user authentication.
+
+Optimize database storage for chat history.
+
+Enhance AI-generated responses for better accuracy.
+
+Contributing
+
+Pull requests are welcome! If you have any suggestions or improvements, feel free to contribute. 🚀
+
