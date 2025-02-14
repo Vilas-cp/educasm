@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
+export const dynamic = "force-dynamic";
+
 
 
 const rateLimiters = {
