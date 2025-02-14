@@ -1,5 +1,5 @@
 // src/components/Playground/PlaygroundView.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { SearchBar } from "../shared/SearchBar";
 import { Loading } from "../shared/Loading";
 import { useApi } from "../../hooks/useApi";
@@ -46,9 +46,7 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({
     typeof setTimeout
   > | null>(null);
   const [currentQuestionTime, setCurrentQuestionTime] = useState<number>(0);
-  const [timerInterval, setTimerInterval] = useState<ReturnType<
-    typeof setInterval
-  > | null>(null);
+  const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [nextQuestionCountdown, setNextQuestionCountdown] = useState<
     number | null
   >(null);
@@ -88,22 +86,32 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({
 
   const startQuestionTimer = (): void => {
     // Clear any existing timer first
-    if (timerInterval) {
-      clearInterval(timerInterval);
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
     }
     
     const interval = setInterval(() => {
       setCurrentQuestionTime((prev) => prev + 1);
     }, 1000);
-    setTimerInterval(interval);
+    timerIntervalRef.current = interval;
   };
 
   const stopQuestionTimer = (): void => {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      setTimerInterval(null);
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
     }
   };
+  const togglePause = () => {
+    if (isPaused) {
+      startQuestionTimer();
+    } else {
+      stopQuestionTimer();
+    }
+    setIsPaused(!isPaused);
+  };
+  const COUNTDOWN_DURATION = 5;
+
 
   const prefetchNextQuestion = async () => {
     try {
@@ -175,15 +183,7 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({
     }
   };
 
-  const togglePause = () => {
-    setIsPaused(!isPaused);
-    if (nextQuestionTimer) {
-      clearTimeout(nextQuestionTimer);
-      setNextQuestionTimer(null);
-    }
-  };
-
-  const COUNTDOWN_DURATION = 5;
+  
 
   const updateStats = (isCorrect: boolean): void => {
     setStats((prev) => {
@@ -278,12 +278,11 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({
   // Add cleanup for timer
   useEffect(() => {
     return () => {
-      if (timerInterval) {
-        clearInterval(timerInterval);
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current);
       }
     };
   }, []);
-
   const formatAccuracy = (accuracy: number): number => {
     return Math.round(accuracy);
   };
@@ -494,4 +493,4 @@ export const PlaygroundView: React.FC<PlaygroundViewProps> = ({
   );
 };
 
-// abc
+
