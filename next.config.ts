@@ -1,8 +1,9 @@
-import type { NextConfig } from 'next'
- 
-const nextConfig: NextConfig = {
-  output: 'standalone', // Outputs a Single-Page Application (SPA)
-  distDir: 'build', // Changes the build output directory to `build`
-}
- 
-export default nextConfig
+const nextConfig = {
+  output: "standalone", 
+  distDir: "build", 
+  experimental: {
+    appDir: true, // Ensures API routes work properly
+  },
+};
+
+export default nextConfig;
